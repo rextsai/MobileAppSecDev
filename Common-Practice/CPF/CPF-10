@@ -1,0 +1,32 @@
+安全程式碼範例：
+Android： 
+如開發人員不使用ProGuard或DexGuard來統一控制Log的行為，本指引提供此範例讓使用者可重新打包原的android.util.Log，來達到統一控制Log行為
+//自訂一個工具程式Log, 將原有的android.util.Log重新包裝
+public class Log{
+	//集中設定FLAG的狀態，如為開發環境則設為true, 反之則為false
+    private static boolean FLAG = false;
+    public static void d(String enable_tag, String message,Object...args){
+        if(FLAG)
+            android.util.Log.d(enable_tag, message+args);
+    }
+    public static void e(String enable_tag, String message,Object...args){
+        if(FLAG)
+            android.util.Log.e(enable_tag, message+args);
+    }
+    public static void v(String enable_tag, String message,Object...args){
+        if(FLAG)
+            android.util.Log.v(enable_tag, message+args);
+    }
+    public static void i(String enable_tag, String message,Object...args){
+        if(FLAG)
+            android.util.Log.i(enable_tag, message+args);
+    }
+}
+
+iOS： 
+於Release版本時，覆寫NSLog函式，以達到不洩漏資訊的目的
+NSLog rewrite when publishing
+//disable NSLog when Release
+#ifndef DEBUG
+    #define NSLog(...)
+#endif
