@@ -1,0 +1,12 @@
+不安全程式碼範例：
+網頁主機：  
+使用字串加減維護XML
+xmlstr = "<username>" + "foo<" + "</username>";
+安全程式碼範例：
+Android； 
+libxml_disable_entity_loader(true);
+
+網頁主機：  
+使用元件維護XML
+XmlNode node = doc.CreateNode("username");
+node.Value = "foo<";
