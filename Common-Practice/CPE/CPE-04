@@ -1,0 +1,87 @@
+Android： 
+在Android當中，圖片定位資料可自行於系統上管理，將其設定為關閉，以避免圖片定位資料被紀錄。不過一般使用者並不易明白或容易忽視有些設定。
+茲提供移除圖片地理位置資料的程式碼
+@Override
+public void surfaceCreated(SurfaceHolder holder) {
+    mCamera = Camera.open();    
+
+    Camera.Parameters p = mCamera.getParameters();
+    //移除相機內GPS相關資訊
+    p.removeGpsData();
+    
+    mCamera.setParameters(p);
+}
+
+
+iOS： 
+在iOS當中，定位資料可自行於系統上管理。但相機的地理位置資料通常被使用者忽視。提供圖片地理位置資料的編輯程式碼、移除程式碼。
+圖片地理位置資料編輯程式碼
+- (void) saveImage:(UIImage *)imageToSave withInfo:(NSDictionary *)info
+{
+    // Get the image metadata (EXIF & TIFF)
+    NSMutableDictionary * imageMetadata = [[info objectForKey:UIImagePickerControllerMediaMetadata] mutableCopy];
+    if (!imageMetadata)
+    {
+        imageMetadata = [[NSMutableDictionary alloc] init];
+    }
+    // add (fake) GPS data
+    CLLocationCoordinate2D coordSF = CLLocationCoordinate2DMake(37.732711,-122.45224);
+    // arbitrary altitude and accuracy
+    double altitudeSF = 15.0;
+    double accuracyHorizontal = 1.0;
+    double accuracyVertical = 1.0;
+    NSDate * nowDate = [NSDate date];
+    // create CLLocation for image
+    CLLocation * loc = [[CLLocation alloc] initWithCoordinate:coordSF altitude:altitudeSF horizontalAccuracy:accuracyHorizontal verticalAccuracy:accuracyVertical timestamp:nowDate];
+// this is in case we try to acquire actual location instead of faking it with the code right above
+    if ( loc ) {
+        [imageMetadata setObject:[self gpsDictionaryForLocation:loc] forKey:(NSString*)kCGImagePropertyGPSDictionary];
+    }
+    
+    // Get the assets library
+    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+    
+    // create a completion block for when we process the image
+    ALAssetsLibraryWriteImageCompletionBlock imageWriteCompletionBlock =
+    ^(NSURL *newURL, NSError *error) {
+        if (error) {
+            NSLog( @"Error writing image with metadata to Photo Library: %@", error );
+        } else {
+            NSLog( @"Wrote image %@ with metadata %@ to Photo Library",newURL,imageMetadata);
+        }
+    };
+    
+    // Save the new image to the Camera Roll, using the completion block defined just above
+    [library writeImageToSavedPhotosAlbum:[imageToSave CGImage]
+                                 metadata:imageMetadata
+                          completionBlock:imageWriteCompletionBlock];
+}
+
+圖片地理位置資料清除
+-(void)imagePickerController:(UIImagePickerController *)picker
+didFinishPickingMediaWithInfo:(NSDictionary *)info
+{
+    NSString *mediaType = [info
+                           objectForKey:UIImagePickerControllerMediaType];
+    [self dismissModalViewControllerAnimated:YES];
+    if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
+        UIImage *image = [info 
+                          objectForKey:UIImagePickerControllerOriginalImage];
+        //got image, put image to imageView
+        imageView.image = image;
+        if (newMedia)
+            UIImageWriteToSavedPhotosAlbum(image, 
+                                           self,
+@selector(image:finishedSavingWithError:contextInfo:),
+                                           nil);
+    }
+    else if ([mediaType isEqualToString:(NSString *)kUTTypeMovie])
+    {
+		// Code here to support video if enabled
+	}
+}
+//write image(clean) to Album
+- (void) saveImage
+{
+    UIImageWriteToSavedPhotosAlbum(imageView.image , nil, nil, nil);
+}
