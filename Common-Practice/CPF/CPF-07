@@ -1,0 +1,19 @@
+不安全程式碼範例：
+Android： 
+
+•	在API Level 17 Android 4.2 (JELLY_BEAN_MR1)之前的版本，可以允許開發人員的APP將資料輸出到APP公有區中，下列範例即為將資料輸出到公有區中，並設其權限為共同寫入。
+String FILENAME = "hello_file";
+String string = "hello world!";
+
+FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_WORLD_READABLE);
+fos.write(string.getBytes());
+fos.close();
+
+安全程式碼範例：Android： 
+•	下列範例為安全的範列，此範例改將資料輸出到私有區中，並設其權限為私有，以進一步確保資訊安全。
+String FILENAME = "hello_file";
+String string = "hello world!";
+
+FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+fos.write(string.getBytes());
+fos.close();
