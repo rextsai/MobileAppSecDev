@@ -1,0 +1,9 @@
+不安全程式碼範例：
+網站主機：將admin置於開放網站
+例如Open Cartg管理目錄 \admin
+例如osCommerce管理目錄 catalog\admin
+網站主機：未將安裝目錄移除。
+例如Open Cart安裝目錄 \install
+例如osCommerce安裝目錄 catalog\install
+
+安全程式碼範例：N/A
