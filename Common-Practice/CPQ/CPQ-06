@@ -1,0 +1,4 @@
+安全程式碼範例：N/A
+網站主機：  
+檢查合法檔名
+var isValid = !string.IsNullOrEmpty(fileName) && fileName.IndexOfAny(Path.GetInvalidFileNameChars());
