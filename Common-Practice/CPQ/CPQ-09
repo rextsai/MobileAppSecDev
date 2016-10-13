@@ -1,0 +1,12 @@
+不安全程式碼範例：
+iOS： 
+printf ("%08x %08x %08x %08x %08x\n");
+//NSString *bug = @"%@%@";
+NSLog(bug);
+
+安全程式碼範例：
+iOS： 
+//NSString *bug = @"%@%@";
+NSLog(“bug is %@”,bug);
+網站主機：  
+syslog(LOG_INFO, "%s", cmdBuf);
