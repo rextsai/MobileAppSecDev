@@ -1,0 +1,24 @@
+不安全程式碼範例： 
+SQL語法直接使用+的法式將使用者的輸入串連起來
+@Override
+public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        String groupId = getFromUserInput();//假設有此方法可讀入畫面上使用者的輸入值
+        SQLiteDatabase mDB = mHelper.getWritableDatabase();
+        Cursor out = mDB.rawQuery("SELECT * FROM product where group_id="+groupId, null);
+        out.moveToFirst();
+        return out;
+}
+
+
+
+
+安全程式碼範例： 
+使用參數化方式，將SQL語法和使用者的輸入分離
+@Override
+public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        String groupId = getFromUserInput();//假設有此方法可讀入畫面上使用者的輸入值
+        SQLiteDatabase mDB = mHelper.getWritableDatabase();
+        Cursor out = mDB.rawQuery("SELECT * FROM product where group_id=?", new String[]{groupId});
+        out.moveToFirst();
+        return out;
+}
