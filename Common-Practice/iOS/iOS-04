@@ -1,0 +1,21 @@
+不安全程式碼範例：
+範例一：全面取消 ATS
+NSAppTransportSecurity
+    NSAllowsArbitraryLoads = YES
+範例二：某網域降級TLS
+NSAppTransportSecurity
+    NSExceptionDomains
+        "less-secure.example.com"
+            NSExceptionRequiresForwardSecrecy = NO
+            NSExceptionMinimumTLSVersion = "TLSv1.0"
+範例三：某網域取消 ATS
+NSAppTransportSecurity
+    NSAllowsArbitraryLoads = NO  // Shown for clarity; this is the default
+    NSExceptionDomains
+        "secure-server-i-control.example.com"
+        NSExceptionAllowsInsecureHTTPLoads = YES
+        NSExceptionRequiresForwardSecrecy = NO
+        NSExceptionMinimumTLSVersion = "TLSv1.0"
+        
+        
+安全程式碼範例：N/A
