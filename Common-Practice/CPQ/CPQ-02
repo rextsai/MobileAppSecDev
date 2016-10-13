@@ -1,0 +1,16 @@
+不安全程式碼範例：
+iOS： 
+•	strcat,strcpy,strncat,strncpy,sprintf,vsprintf,gets
+函式不會控制資料結尾，除了長度不安全以外，也會造成沒有結尾。
+int len = (int)self.myInput.text.length;
+    char buf[len+1];
+    //strncpy
+    strncpy(buf,  [self.myInput.text UTF8String] , len);
+安全程式碼範例：
+iOS： 
+•	strlcat,strlcpy,strlcat,strlcpy,snprintf,asprintf,vsnprintf,vasprintf,fgets
+函式會控制資料結尾，除了長度安全以外，也會有結尾。
+int len = (int)self.myInput.text.length;
+    char buf[len+1];
+    //strlpy
+    strlcpy(buf, [self.myInput.text UTF8String] , len);
