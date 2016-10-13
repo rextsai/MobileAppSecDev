@@ -1,0 +1,34 @@
+安全程式碼範例：
+Android： 
+因為Java的Garbage Collection(GC)的特性是，開發人員無法確認何時資料會真的被清空，而String是immutable，基本上無法主動清空，就算指向null，還是需要等待GC完成後，它才不會存在於記憶體中，最有效的方式為改以byte array來存放，在使用完之後，直接將每一個byte值覆寫為0，如此一來立刻就能將資料從記憶體中清空，防止惡意人士從記憶體中盜取。
+
+SecretKey key = KeyGenerator.getInstance("DES").generateKey();     
+byte[] data = key.getEncoded();//處理完相關作業之後立即清空，以避免存在於RAM
+for (byte oneByte:data){ oneByte=0; }
+
+iOS： 
+例如extern unsigned char * CC_SHA256(const void *data, CC_LONG len, unsigned char *md); 中的參數data來源，除了標準的資料輸入以外，還可加入長度、固定的Salt與私密的計算。例如由byte array而來的hash，或者計算後的XOR。
+unsigned char obfuscatedSecretKey[] = { 0x33, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF };
+int hash = [Server ComputeHash:obfuscatedSecretKey];
+
+//One-at-a-Time Hash
++(int) ComputeHash: (unsigned char*) data;
+{
+   const int p = 16777619;
+   int hash = (int)2166136261;
+   int len = (int)strlen((char*)data);
+   for (int i = 0; i < len; i++)
+       hash = (hash ^ data[i]) * p;
+   hash += hash << 13;
+   hash ^= hash >> 7;
+   hash += hash << 3;
+   hash ^= hash >> 17;
+   hash += hash << 5;
+   return hash;
+}
+
+   // XOR the class name against the obfuscated key, to form the real key.
+   unsigned char actualSecretKey[sizeof(obfuscatedSecretKey)];
+   for (int i=0; i<sizeof(obfuscatedSecretKey); i++) {
+       actualSecretKey[i] = obfuscatedSecretKey[i] ^ obfuscatedSecretKey[i];
+   }
