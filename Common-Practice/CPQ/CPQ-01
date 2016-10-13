@@ -1,0 +1,25 @@
+安全程式碼範例：
+iOS: 
+驗證輸入長度、格式Email
+如
+- (BOOL) validEmail:(NSString*) emailString {
+    if([emailString length]==0){
+        return NO;
+    } 
+    NSString *regExPattern = @"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
+    NSRegularExpression *regEx = [[NSRegularExpression alloc] initWithPattern:regExPattern options:NSRegularExpressionCaseInsensitive error:nil];
+    NSUInteger regExMatches = [regEx numberOfMatchesInString:emailString options:0 range:NSMakeRange(0, [emailString length])];
+    if (regExMatches == 0) {
+        return NO;
+    } else {
+        return YES;
+    }
+}
+
+
+
+網頁主機：  
+驗證輸入長度、格式
+.NET使用RegularExpressionValidator ，使用正規表示式來驗證使用者輸入的格式。
+例如檢查英數字輸入6至10位。
+ValidationExpression="[a-zA-Z]{6,10}"
