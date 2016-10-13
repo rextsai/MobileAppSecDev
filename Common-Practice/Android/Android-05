@@ -1,0 +1,12 @@
+安全程式碼範例： 
+//此範例為設定一自行定義的權限(Permission), 並使用它來限制存取MyService
+<permission android:name="com.example.mypermission" android:label="my_permission" android:protectionLevel="dangerous">
+</permission>`
+
+<service
+android:name="org.appsec.MyService" android:permission="org.appsec.mypermission">
+<intent-filter>
+
+<action android:name="org.app.MY_ACTION" />
+</intent-filter>
+</service>
