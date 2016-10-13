@@ -1,0 +1,45 @@
+安全程式碼範例： 
+Sender.java
+// 發送廣播事件用的Action名稱
+public static final String BROADCAST_ACTION =
+        "org.appsec.broadcast.action.MYBROADCAST";
+...
+// 建立準備發送廣播事件的Intent物件
+Intent intent = new Intent(BROADCAST_ACTION);
+// 如果需要的話，也可以設定資料到Intent物件
+intent.putExtra("UserName", userName);
+intent.putExtra("UserId", userId);
+// 發送廣播事件
+sendBroadcast(intent);
+
+Recevier.java
+// 繼承自BroadcastReceiver的廣播接收元件
+public class MyBroadcastReceiver extends BroadcastReceiver {
+    // 接收廣播後執行這個方法
+    
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        // 讀取包含在Intent物件中的資料
+        String name = intent.getStringExtra("UserName");
+        String id = intent. getStringExtra ("UserId");
+        ...
+        // 因為這不是Activity元件，需要使用Context物件的時候，
+        // 不可以使用「this」，要使用參數提供的Context物件
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+}
+
+AndroidManifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest ... >
+    <application … >
+        <!-- 使用receiver標籤，名稱設定廣播接收元件類別名稱 -->
+        <receiver android:name="MyBroadcastReceiver">
+            <intent-filter>
+                <!-- 使用Action名稱設定接收的廣播事件 -->
+                <action android:name=
+                    " org.appsec.broadcast.action.MYBROADCAST" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>
