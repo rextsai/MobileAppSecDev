@@ -1,0 +1,23 @@
+安全程式碼範例：
+Android： 
+此範例分別說明如何在XML檔或是Java程式碼內設定停用自動校正
+In XML使用android:inputType="textNoSuggestions"　停用此功能
+<EditText android:id="@+id/edtInput"
+        android:layout_width="0dip"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:inputType="textNoSuggestions"
+        android:maxLines="4"
+        android:maxLength="2000"/>
+
+In Java Code使用InputType.TYPE_TEXT_FLAG_NO_ SUGGESTIONS停用此功能
+edtInput.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+
+
+iOS： 
+•	建議關閉文字輸入框的自動校正功能，以免資料洩漏
+•	myInput.autoCorrectionType = UITextAutocorrectionTypeNo;
+•	建議關閉文字輸入框的拼字校正功能，以免資料洩漏
+•	myInput.spellCheckingType = UITextSpellCheckingTypeNo;
+•	並可由手機設定中心，清除輸入的紀錄
+General > Reset > Reset Keyboard Dictionary.
