@@ -1,0 +1,87 @@
+安全程式碼範例：
+Android： 
+使用Google提供的ProGuard，來將程式碼進行混淆。
+在bulid.gradle檔案中，把minifyEnabled改成true即可啟動
+buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+iOS： 
+提供偵測裝置是否處於jail-broken模式原始碼
++(BOOL)isJailbroken{
+   #if !(TARGET_IPHONE_SIMULATOR)
+   if ([[NSFileManager defaultManager] fileExistsAtPath:@"/Applications/Cydia.app"]){
+       return YES;
+   }else if([[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/MobileSubstrate.dylib"]){
+       return YES;
+   }else if([[NSFileManager defaultManager] fileExistsAtPath:@"/bin/bash"]){
+       return YES;
+   }else if([[NSFileManager defaultManager] fileExistsAtPath:@"/usr/sbin/sshd"]){
+       return YES;
+   }else if([[NSFileManager defaultManager] fileExistsAtPath:@"/etc/apt"]){
+       return YES;
+   }
+   if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"cydia://package/com.example.package"]]){
+       //Device is jailbroken
+       return YES;
+   }
+   //try write /private
+   NSError *error;
+   NSString *stringToBeWritten = @"This is a test.";
+   [stringToBeWritten writeToFile:@"/private/jailbreak.txt" atomically:YES encoding:NSUTF8StringEncoding error:&error];
+   if(error==nil){
+       //Device is jailbroken
+       return YES;
+   } else {
+       [[NSFileManager defaultManager] removeItemAtPath:@"/private/jailbreak.txt" error:nil];
+   }
+   #endif
+   //All checks have failed. Most probably, the device is not jailbroken
+   return NO;
+}
+iOS:提供拒絕DEBUG模式原始碼(for release version)
+//拒絕DEBUG模式的執行
+#import <dlfcn.h>
+#import <sys/types.h>
+typedef int (*ptrace_ptr_t)(int _request, pid_t _pid, caddr_t _addr, int _data);
+#if !defined(PT_DENY_ATTACH)
+#define PT_DENY_ATTACH 31
+#endif
+void disable_gdb() {
+   void* handle = dlopen(0, RTLD_GLOBAL | RTLD_NOW);
+   ptrace_ptr_t ptrace_ptr = dlsym(handle, "ptrace");
+   ptrace_ptr(PT_DENY_ATTACH, 0, 0, 0);
+   dlclose(handle);
+}
+int main(int argc, char * argv[]) {
+   #if !(DEBUG) // Don't interfere with Xcode debugging sessions.
+       disable_gdb();
+   #endif
+   @autoreleasepool {
+       return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+   }
+}
+iOS混亂器(obfuscator)說明
+iOS系統內定安裝後，已經實作了Class rename；而字串的保護需自行實作；而降低可視度，通常也實現在混亂器工具中
+例如：PreEmptive Protection for iOS實現如下的內容
+降低可視度
+int max(int x, int y) {
+    int switchvar = 1942843;
+    while (true) {
+        switch (switchvar) {
+            case 598232:
+                return y;
+            case 1942843:
+                if (x >= y) {
+                    switchvar = 8289314;
+                } else {
+                    switchvar = 598232;
+                }
+              break;
+            case 8289314:
+                return x;
+        }
+    }
+}
