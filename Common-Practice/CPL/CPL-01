@@ -1,0 +1,48 @@
+安全程式碼範例：
+Android： 
+•	//定義使用ACCOUNT_MANAGER與INTERNET權限
+<manifest ... >
+    <uses-permission android:name="android.permission.ACCOUNT_MANAGER" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    ...
+</manifest>
+//實作CallBack
+AccountManager am = AccountManager.get(this);
+Bundle options = new Bundle();
+am.getAuthToken(
+    myAccount_,                     // Account retrieved using getAccountsByType()
+    "Manage your tasks",            // Auth scope
+    options,                        // Authenticator-specific options
+    this,                           // Your activity
+    new OnTokenAcquired(),          // Callback called when a token is successfully acquired
+    new Handler(new OnError()));    // Callback called if an error occurs
+•	private class OnTokenAcquired implements AccountManagerCallback<Bundle> {
+    @Override
+    public void run(AccountManagerFuture<Bundle> result) {
+        ...
+        Intent launch = (Intent) result.getResult().get(AccountManager.KEY_INTENT);
+        if (launch != null) {
+            startActivityForResult(launch, 0);
+            return;
+        }
+    }
+}
+//獲取token
+private class OnTokenAcquired implements AccountManagerCallback<Bundle> {
+    @Override
+    public void run(AccountManagerFuture<Bundle> result) {
+        // Get the result of the operation from the AccountManagerFuture.
+        Bundle bundle = result.getResult();
+
+        // The token is a named value in the bundle. The name of the value
+        // is stored in the constant AccountManager.KEY_AUTHTOKEN.
+        token = bundle.getString(AccountManager.KEY_AUTHTOKEN);
+        ...
+    }
+}
+//呼叫OAuth2服務
+URL url = new URL("https://www.googleapis.com/tasks/v1/users/@me/lists?key=" + your_api_key);
+URLConnection conn = (HttpURLConnection) url.openConnection();
+conn.addRequestProperty("client_id", your client id);
+conn.addRequestProperty("client_secret", your client secret);
+conn.setRequestProperty("Authorization", "OAuth " + token);
