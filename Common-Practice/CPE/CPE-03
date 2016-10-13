@@ -1,0 +1,118 @@
+Android:
+關於個資的部分(連絡人資料、通話記錄、簡訊資料)，開發人員需要檢查是否具備此授權，如果沒有，需要主動向使用者要求允許權限。
+
+import android.support.v4.app.ActivityCompat;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import static android.Manifest.permission.*;
+public class MainActivity extends AppCompatActivity{
+  private static final int MY_REQUEST_ACCESS_CONTACTS = 5;
+  
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      setContentView(R.layout.activity_main);
+      int permission = ActivityCompat.checkSelfPermission(this,
+              Manifest.permission.READ_CONTACTS);
+      if (permission != PackageManager.PERMISSION_GRANTED) {
+          //未取得權限，向使用者要求允許權限
+          ActivityCompat.requestPermissions( this,
+                  new String[]{READ_CONTACTS, WRITE_CONTACTS},
+                  MY_REQUEST_ACCESS_CONTACTS);
+      }else{
+         //已有權限，可進行檔案存取
+          readContacts();
+      }
+  }
+	 @Override public void onRequestPermissionsResult(int requestCode,
+        String permissions[], int[] grantResults) {
+    switch (requestCode) {
+        case MY_REQUEST_ACCESS_CONTACTS: {
+            // 如果請求被取消的話，傳回的陣列的大小是
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                // 請求被允許，接下來就可以做一些和連絡人相關的動作
+                readContacts();
+
+            } else {
+                       //使用者拒絕權限，顯示對話框告知
+                    new AlertDialog.Builder(this)
+                          .setMessage("必須允許聯絡人權限來使用此功能")
+                          .setPositiveButton("OK", null)
+                          .show();
+
+            }
+            return;
+        }
+
+        // 如果有其它的權限，那就需要處理個別的 CASE
+    }
+}
+}
+
+
+iOS： 
+iOS不允許App存取通話紀錄、簡訊資料與多媒體簡訊，但允許經使用者授權後，取得手機聯絡人相關資料，至於修改、刪除聯絡人資料，也建議須使用者確認。
+針對[檢查授權、新增、修改、刪除聯絡人資料]提供相關程式碼如下。
+檢查授權
+// Check the authorization status of our application for Address Book
+-(void)checkAddressBookAccess
+{
+    switch (ABAddressBookGetAuthorizationStatus())
+    {
+        // Update our UI if the user has granted access to their Contacts
+        case  kABAuthorizationStatusAuthorized:
+            [self accessGrantedForAddressBook];
+            break;
+            // Prompt the user for access to Contacts if there is no definitive answer
+        case  kABAuthorizationStatusNotDetermined :
+            [self requestAddressBookAccess];
+            break;
+            // Display a message if the user has denied or restricted access to Contacts
+        case  kABAuthorizationStatusDenied:
+        case  kABAuthorizationStatusRestricted:
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Privacy Warning"
+                                                            message:@"Permission was not granted for Contacts."
+                                                           delegate:nil
+                                                  cancelButtonTitle:@"OK"
+                                                  otherButtonTitles:nil];
+            [alert show];
+        }
+            break;
+        default:
+            break;
+    }
+}
+
+新增聯絡人
+	ABNewPersonViewController *picker = [[ABNewPersonViewController alloc] init];
+	picker.newPersonViewDelegate = self;
+	UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:picker];
+    [self presentViewController:navigation animated:YES completion:nil];
+修改(顯示+修改) 聯絡人
+	// Search for the person named "Appleseed" in the address book
+	NSArray *people = (NSArray *)CFBridgingRelease(ABAddressBookCopyPeopleWithName(self.addressBook, CFSTR("Appleseed")));
+	// Display "Appleseed" information if found in the address book 
+	if ((people != nil) && [people count])
+	{
+		ABRecordRef person = (__bridge ABRecordRef)[people objectAtIndex:0];
+		ABPersonViewController *picker = [[ABPersonViewController alloc] init];
+		picker.personViewDelegate = self;
+		picker.displayedPerson = person;
+		// Allow users to edit the person’s information
+		picker.allowsEditing = YES;
+		[self.navigationController pushViewController:picker animated:YES];
+	}
+
+刪除聯絡人
+        CFErrorRef *error = NULL;
+        ABAddressBookRemoveRecord(self.addressBook, (ABRecordRef)person, error);
+        if(error != NULL)
+        {
+            //if any error happen
+            UIAlertView    *alert =[[UIAlertView alloc] initWithTitle:@"Error" message:@"Deleting Contact" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK",nil];
+            [alert show];
+        }
+        ABAddressBookSave(self.addressBook, NULL);
+
