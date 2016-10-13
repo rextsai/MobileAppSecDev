@@ -1,0 +1,13 @@
+Android： 
+為符合個資法要求，當無法確定是否是使用者本人時，敏感性資料在顯示時，需要進行部分隱藏。若必需提供完整敏感性資料來進行作業時，開發人員需確定是使用者本人(例如，APP程式要求使用者登入後台主機以進行身分驗證)，才可以明碼顯示之。
+Android:以下程式提供在設備畫面上呈現，隱藏第456碼的身分證字號
+		TextView textView1 = (TextView) findViewByID(R.id.textView1);
+      textView1.setText(UserId.substring(0, 3) + "***" + UserId.substring(3+3);
+      
+iOS： 
+而為了取代敏感資料(例如帳號/身分字號)，建議於資料庫產生另一個代號，可參考Hash雜湊值可以用於唯一標的識別的秘密資訊。經由將帳號改由另一個代號來處理，可降低原始帳號的顯示問題。產生代號時，也需注意代號重複問題，可透過索引與部分亂數的方法，以檢核並組成代號。
+例如，SHA-1，可產生160位元的輸出；SHA-256 ，可產生256位元的輸出。
+茲列出隱藏部分原始碼範例：
+隱藏部分(隱藏身分字號之456碼)
+    NSString *str = self.edit_input.text;
+    self.label_Account.text = [str stringByReplacingCharactersInRange:NSMakeRange(3, 3)  withString:@"***"];
