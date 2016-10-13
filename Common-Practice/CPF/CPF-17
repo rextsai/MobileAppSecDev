@@ -1,0 +1,86 @@
+不安全程式碼範例：
+iOS： 
+Application Setting Read Example
+將設定置於plist設定檔，容易被破解後修改¬
+•	   //取得plist檔案路徑
+•	   NSString *filePath = [[NSBundle mainBundle] pathForResource:@"secrets" ofType:@"plist"];
+•	   NSFileManager *fileManager = [NSFileManager defaultManager];
+•	   [self AppendLog:[NSString stringWithFormat:@"filePath=%@", filePath]];
+•	   //判斷plist檔案存在才讀取
+•	   if ([fileManager fileExistsAtPath: filePath]) {
+•	       NSMutableDictionary *data = [[NSMutableDictionary alloc] initWithContentsOfFile:filePath];
+•	       NSString *hash_password = [data objectForKey:@"hash_password"]; //從data中取值
+•	       NSString *setting_lifes = [data objectForKey:@"setting_lifes"]; //從data中取值
+•	   } else{
+•	       [self AppendLog:@"file not exists"];
+   }
+
+
+
+
+
+安全程式碼範例：
+Android： 
+此範例說明如何將加密儲存於property file的密碼來和使用者輸入的密碼做安全的比對
+public class MainActivity extends ActionBarActivity {
+    String flag = "com.ereach.helloworld";
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        
+        
+String encryptPassword = loadPassword();
+//因此加密方式為不可逆，如需要比較密碼時，請將使用輸入的密碼加密後比對
+// if(encrypt(userInputPassword).equals(encryptPassword))
+    }
+public static String encrypt(String s){
+        MessageDigest sha = null;
+        try{
+            sha = MessageDigest.getInstance("SHA-256");
+            sha.update(s.getBytes());
+        }catch(Exception e){
+            e.printStackTrace();
+            return "";
+        }
+        return byte2hex(sha.digest());
+    }
+    private static String byte2hex(byte[] bytes){
+        String hs="";
+        String stmp="";
+        for (byte myByte: bytes){
+            stmp=(java.lang.Integer.toHexString(myByte & 0XFF));
+            if (stmp.length()==1) hs=hs+"0"+stmp;
+            else hs=hs+stmp;
+        }
+        return hs.toUpperCase();
+    }
+	 //讀取資料的方法
+private String loadPassword(){
+//建構properties物件
+Properties properties = new Properties();
+    try{
+        FileInputStream stream = this.openFileInput("music.cfg");
+        //讀取兩個檔的內容
+        properties.load(stream);
+        properties.load(stream1);
+         
+
+    	}catch(FileNotFoundException e)
+    	{
+    	return;
+    	}catch(IOException e){
+    	return;
+    	}
+   	 return String.valueOf(properties.get("password"));
+}
+}
+
+iOS： 
+protect application parameter : example code
+•	將設定或參數置於程式碼，或進行隱藏
+//Stored as String in program, still not so safe to cracker
+NSString *APIKey = @"abcdef123456";
+// Stored as binary array to prevent strings attack
+ // Stored using SHA(class name) XOR secret
+ unsigned char obfuscatedSecretKey[] = { 0x3e, 0xcc, 0x9d, 0xca, 0x2f, 0x8a, 0xf2, 0xc1, 0x57, 0x01, 0xc2, 0x2e, 0x44, 0xea, 0x0d, 0xf5, 0x60, 0x09, 0x99, 0xe7, 0xb1, 0x13, 0x2a, 0x6f, 0x2c, 0xa2, 0xfe, 0x12, 0xbb, 0x58, 0x90, 0x85 };
