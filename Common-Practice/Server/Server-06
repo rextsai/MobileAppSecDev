@@ -1,0 +1,12 @@
+安全程式碼範例：
+網頁主機： 
+增加X-Frame-Options
+X-Frame-Options: DENY
+X-Frame-Options: SAMEORIGIN
+X-Frame-Options: ALLOW-FROM https://example.com/
+DENY
+The page cannot be displayed in a frame, regardless of the site attempting to do so.
+SAMEORIGIN
+The page can only be displayed in a frame on the same origin as the page itself.
+ALLOW-FROM uri
+The page can only be displayed in a frame on the specified origin.
