@@ -1,0 +1,27 @@
+安全程式碼範例：
+Android： 
+本範例提供一重新打包的Assert，來達成中央集中設定的行為
+//自訂一個工具程式Assert, 將原有的juint.framework.Assert中會使用到的方法，重新包裝
+public class Assert{
+	//集中設定FLAG的狀態，如為開發環境則設為true, 反之則為false
+    private static boolean FLAG = false;
+    public static void assertEquals(int expected, int actual){
+        if(FLAG) junit,framework.Assert.assertEquals (expected, actual);
+    }
+    public static void assertSame(Object expected, Object actual){
+        if(FLAG) junit,framework.Assert.assertSame (expected, actual);
+    }
+
+}
+
+iOS： 
+在iOS中，NSAssert斷言函式，可協助開發人員進行檢查程式的運作是否正確。XCode的編譯設定，也預設將NSAssert函式在Release時，自動關閉其運作。
+ 
+//也可加上 try catch 以免執行部分產生例外，而造成crash dump.
+//using try catch exception block
+@try { 
+       //some danger block of codes
+   }
+   @catch (NSException *ex) {
+       NSLog(@"Exception happened: %@", [ex description]);
+  }
