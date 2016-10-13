@@ -1,0 +1,23 @@
+不安全程式碼範例：
+Android： 
+假設呼叫getInputStream()時它拋出一個異常訊息，而不是收到的getInputStream()的內容：
+•	javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+•	        at org.apache.harmony.xnet.provider.jsse.OpenSSLSocketImpl.startHandshake(OpenSSLSocketImpl.java:374)
+•	        at libcore.net.http.HttpConnection.setupSecureSocket(HttpConnection.java:209)
+•	        at libcore.net.http.HttpsURLConnectionImpl$HttpsEngine.makeSslConnection(HttpsURLConnectionImpl.java:478)
+•	        at libcore.net.http.HttpsURLConnectionImpl$HttpsEngine.connect
+           (HttpsURLConnectionImpl.java:433)
+•	        at libcore.net.http.HttpEngine.sendSocketRequest(HttpEngine.java:290)
+•	        at libcore.net.http.HttpEngine.sendRequest(HttpEngine.java:240)
+•	        at libcore.net.http.HttpURLConnectionImpl.getResponse(HttpURLConnectionImpl.java:282)
+•	        at libcore.net.http.HttpURLConnectionImpl.getInputStream(HttpURLConnectionImpl.java:177)
+•	        at libcore.net.http.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:271)
+發生這種情況的原因很多，其中包括：發行Server憑證的CA不是由具有公信力CA簽名，但自簽名伺服器配置缺少中間CA 無法確認可以是安全的，最好的方式還是綁定可信任的憑證，憑證綁定實作，請參考CPM-05。
+
+安全程式碼範例：
+Android:  
+假設你有由信任CA頒發的證書的Web伺服器，你可以用URLConnection來進行安全要求：
+URL url = new URL("https://wikipedia.org");
+URLConnection urlConnection = url.openConnection();
+InputStream in = urlConnection.getInputStream();
+copyInputStreamToOutputStream(in, System.out);
