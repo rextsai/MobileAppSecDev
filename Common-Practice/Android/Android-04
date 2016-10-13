@@ -1,0 +1,9 @@
+不安全程式碼範例： 
+//implicit 
+Intent intent = new Intent("com.my.app.action") ;
+PendingIntent pi = PendingIntent.getService(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+安全程式碼範例： 
+//explicit (to MyService) 
+Intent intent = new Intent(context, MyService.class); 
+PendingIntent pi = PendingIntent.getService(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
