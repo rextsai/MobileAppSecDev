@@ -1,0 +1,66 @@
+安全程式碼範例：
+Android:  
+根據使用情境不同，以下提供二種方式來防止複製/貼上的行為
+1.停止元件的剪下/複製功能
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v4.app.NavUtils; import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.EditText;
+public class UncopyableActivity extends Activity { private EditText copyableEdit;
+private EditText uncopyableEdit;
+@Override
+public void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState); setContentView(R.layout.uncopyable);
+copyableEdit = (EditText) findViewById(R.id.copyable_edit); uncopyableEdit = (EditText) findViewById(R.id.uncopyable_edit);
+// By setCustomSelectionActionMODECallback method,
+// Possible to customize menu of character string selection. uncopyableEdit.setCustomSelectionActionModeCallback(actionModeCallback);
+}
+private ActionMode.Callback actionModeCallback = new ActionMode.Callback() { public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+return false; }
+public void onDestroyActionMode(ActionMode mode) { }
+public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+// *** 從功能選單刪除 android.R.id.copy 
+MenuItem itemCopy = menu.findItem(android.R.id.copy);
+if (itemCopy != null) {
+menu.removeItem(android.R.id.copy); }
+// *** 從功能選單刪除android.R.id.cut 
+
+MenuItem itemCut = menu.findItem(android.R.id.cut); if (itemCut != null) {
+menu.removeItem(android.R.id.cut); }
+return true; }
+public boolean onActionItemClicked(ActionMode mode, MenuItem item) { return false;
+} };
+@Override
+public boolean onCreateOptionsMenu(Menu menu) {
+getMenuInflater().inflate(R.menu.uncopyable, menu);
+return true; }
+@Override
+public boolean onOptionsItemSelected(MenuItem item) {
+switch (item.getItemId()) { case android.R.id.home:
+NavUtils.navigateUpFromSameTask(this); return true;
+}
+return super.onOptionsItemSelected(item); }
+}
+2.停止長按彈出視窗
+將android:longClickable 設為false 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent" android:layout_height="match_parent"
+android:orientation="vertical">
+<TextView
+android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/unlongclickable_description" />
+<!-- EditText to prohibit copy/cut EditText -->
+<!-- *** 將 android:longClickable設為False 來禁止. --> <EditText
+android:layout_width="match_parent"
+android:layout_height="wrap_content" android:longClickable="false" android:hint="@string/unlongclickable_hint" />
+</LinearLayout>
+
+iOS： 
+監聽TextField/TextView事件
+@interface ViewControllerPaste : UIViewController <UITextFieldDelegate, UITextViewDelegate>
+當敏感輸入元件有事件(Copy等)時，不允許Copy/Paste
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
+   //identy those who not allow copy/paste
+   [myInput resignFirstResponder];
+   return NO;
+}
