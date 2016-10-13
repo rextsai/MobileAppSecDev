@@ -1,0 +1,24 @@
+安全程式碼範例： 
+提供蓋掉螢幕的範例碼、提供隱藏欄位的建議方法
+先製作滿版圖片secure-image.png (320x568 for iPhone)
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+   // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
+ // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+       if (!self.backgroundImage){
+           UIImageView *myBanner = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"secure-image.png"]];
+           self.backgroundImage = myBanner;
+       }
+       [self.window addSubview:self.backgroundImage];
+   // you can hide security field here 
+   // 隱藏欄位
+   // [viewControl.secure_field setHidden:TRUE];
+}
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+   // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+   if (self.backgroundImage)
+       [self.backgroundImage removeFromSuperview];
+   // you should visi security field here 
+   // 回復已隱藏欄位
+   // [viewControl.secure_field setHidden:FALSE];
+}
+
