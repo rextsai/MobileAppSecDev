@@ -1,0 +1,12 @@
+不安全程式碼範例： 
+使用不指定接收Class的Intent來傳遞機密資訊，是不安全的也可能會被攔截，而使得資料外洩。
+Intent intent = new Intent();
+intent.putExtra("RESULT", "Sensitive Info");
+startActivity(intent);
+
+安全程式碼範例： 
+當使用Intent來傳遞資料給Activity, 為維持資料安全，請使用明文指定接收Class的名稱。
+//明文指定接收此intent的類別，以避免其它程式攔截取得資訊，或改變程式流程
+Intent intent = new Intent(this, LoginActivity.class);
+intent.putExtra("RESULT", "Not Sensitive Info");
+startActivity(intent);
