@@ -1,0 +1,61 @@
+不安全程式碼範例： 
+不啟用ARC時，又沒有完成釋放記憶體。
+@interface myInputStream : NSObject {
+	NSInputStream *stream;
+}
++ (void)initialize
+{
+	stream = NSInputStream inputStreamWithFileAtPath:somepath]];
+}
+- (void)dealloc
+{
+          //需要手動release
+	//[stream release]; 
+	[super dealloc];
+}
+
+
+
+
+ 
+Swift循環強型鏈結問題
+物件宣告
+class Person {
+    let name: String
+    init(name: String) { self.name = name }
+    var apartment: Apartment?
+    deinit { print("\(name) is being deinitialized") }
+}
+class Apartment {
+    let unit: String
+    init(unit: String) { self.unit = unit }
+    var tenant: Person?
+    deinit { print("Apartment \(unit) is being deinitialized") }
+}
+參數宣告
+var john: Person?
+var unit4A: Apartment?
+建立實體
+john = Person(name: "John Appleseed")
+unit4A = Apartment(unit: "4A")
+關係指派
+john!.apartment = unit4A
+unit4A!.tenant = john
+釋放實體
+john = nil
+unit4A = nil
+強型鏈結而導致ARC無法正確運作，記憶體無法被釋放。
+ 
+
+
+
+
+
+安全程式碼範例： 
+循環強型鏈結問題，改用弱型鏈結
+class Apartment {
+    let unit: String
+    init(unit: String) { self.unit = unit }
+    weak var tenant: Person?
+    deinit { print("Apartment \(unit) is being deinitialized") }
+}
