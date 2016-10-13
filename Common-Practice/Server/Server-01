@@ -1,0 +1,50 @@
+不安全程式碼範例：網站主機： 
+例如過時OpenSSL版本OpenSSL/1.0.1e與太多資訊洩漏。
+telnet ---.---.---.tw 80
+Trying 0.0.0.0……….....
+Connected to ---.---.---.tw.
+Escape character is '^]'.
+HEAD / HTTP/1.0
+ 
+
+
+安全程式碼範例：
+網站主機： 
+較少資訊洩漏
+telnet www.-----.com.tw 80
+HTTP/1.0 200 OK
+Date: Sat, 30 Jul 2016 05:52:56 GMT
+P3P: policyref="http://info.-----.com/w3c/p3p.xml", ... Cache-Control: max-age=3600, public
+Vary: Accept-Encoding
+Content-Type: text/html; charset=UTF-8
+Server: ATS
+
+網站主機：  
+啟用HSTS機制
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <system.webServer>
+        <rewrite>
+            <rules>
+                <rule name="HTTP to HTTPS redirect" stopProcessing="true">
+                    <match url="(.*)" />
+                    <conditions>
+                        <add input="{HTTPS}" pattern="off" ignoreCase="true" />
+                    </conditions>
+                    <action type="Redirect" url="https://{HTTP_HOST}/{R:1}"
+                        redirectType="Permanent" />
+                </rule>
+            </rules>
+            <outboundRules>
+                <rule name="Add Strict-Transport-Security when HTTPS" enabled="true">
+                    <match serverVariable="RESPONSE_Strict_Transport_Security"
+                        pattern=".*" />
+                    <conditions>
+                        <add input="{HTTPS}" pattern="on" ignoreCase="true" />
+                    </conditions>
+                    <action type="Rewrite" value="max-age=31536000" />
+                </rule>
+            </outboundRules>
+        </rewrite>
+    </system.webServer>
+</configuration>
