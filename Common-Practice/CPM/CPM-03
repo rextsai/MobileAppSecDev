@@ -1,0 +1,32 @@
+安全程式碼範例：
+Android： 
+可以在Activity內加上下面二個方法來達成local-session-timeout
+@Override public boolean dispatchTouchEvent(MotionEvent ev) {     
+	lastActivity = new Date().getTime();  //取得最後動作的時間      
+	return super.dispatchTouchEvent(ev); 
+}
+@Override public void onResume() {     
+	long now = new Date().getTime();     
+	if (now - lastActivity > 300000) {     //超過五分鐘則自動登出   
+	// startActivity and force logon     } } 
+
+iOS： 
+iOS: local-session-timeout code實作
+1.啟動時間計算
+   [myApp setLoginDate:[NSDate date]];
+- (void) setLoginDate: (NSDate *)indate
+{
+   loginDate = indate;
+}
+2.檢查是否在安全時間內
+[NSString stringWithFormat:@"isValidDate=%d",[myApp isLoginDateValid],
+- (BOOL) isLoginDateValid
+{
+   if (!loginDate)
+       return FALSE;
+   //valid for 60 seconds
+   NSDate *max_date = [loginDate dateByAddingTimeInterval:60];
+   return
+       (([loginDate compare:[NSDate date]] == NSOrderedAscending) &&
+       ([max_date compare:[NSDate date]] == NSOrderedDescending));
+}
