@@ -1,0 +1,6 @@
+安全程式碼範例：
+Android：
+請注意，Android環境中目前無任何設備提供的ID是無法被偽裝的，所以不可以使用任何MAC Address, IMSI, IMEI, UUID, android id, device id這些有設備詢問而來的ID做為授權的根據
+iOS： 
+Device.UUID範例碼
+[NSString stringWithFormat:@"UUID=%@", [[[UIDevice currentDevice] identifierForVendor] UUIDString]];
