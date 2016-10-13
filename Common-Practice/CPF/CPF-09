@@ -1,0 +1,33 @@
+安全程式碼範例：
+Android： 
+此範例為設定如何停用HttpURLConnection的cache。
+URL url = new URL(urlString); HttpURLConnection connection = (HttpURLConnection) url.openConnection();  connection.setDefaultUseCaches(false); 
+connection.setUseCaches(false);
+
+iOS： 
+手機端：清除連線cache
+	[[NSURLCache sharedURLCache] removeAllCachedResponses];
+  [[NSURLCache sharedURLCache] setDiskCapacity:0];
+  [[NSURLCache sharedURLCache] setMemoryCapacity:0];
+
+主機端： 
+//disable caching of Controller
+[OutputCacheAttribute(VaryByParam = "*", Duration = 0, NoStore = true)] // will be applied to all actions in MyController, unless those actions override with their own decoration
+public class MyController : Controller
+{
+  // ... 
+}
+//disable caching for specific one
+public class MyController : Controller
+{
+    [OutputCacheAttribute(VaryByParam = "*", Duration = 0, NoStore = true)] // will disable caching for Index only
+    public ActionResult Index()
+    {
+       return View();
+    }
+} 
+ 
+瀏覽器(網頁內容/html)：
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
