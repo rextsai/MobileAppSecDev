@@ -1,0 +1,7 @@
+安全程式碼範例：
+iOS： 
+最好的方法是不使用內嵌瀏覽器元件。
+•	謹慎使用UIWebView : stringByEvaluatingJavaScriptFromString
+- (NSString *)stringByEvaluatingJavaScriptFromString:(NSString *)script
+主機： 
+參考Server-06。
