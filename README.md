@@ -5,4 +5,7 @@
 
 ## License 授權
 ###### Source code from lots place, belongs to Source Owners.
+###### 原始碼由各種來源而來, 版權屬於原始來源。
+
 ###### copyrights are all reservered.
+###### 相關版權均保留。
