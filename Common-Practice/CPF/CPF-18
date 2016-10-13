@@ -1,0 +1,31 @@
+安全程式碼範例：
+Android： 
+因主機端已對Cookie進行安全設定，故設備端需配合偵測Cookie是否為httpOnly/requireSSL, 來進一步確認此Cookie是否同時具有此設定，注意：從Android API22開始HttpClient已經棄用，新的HttpCookie無法檢查isSecure
+CookieStore cookieStore = java.net.CookieManager.getCookieStore();
+        if (cookieStore != null) {
+            List<HttpCookie> cookies = cookieJar.getCookies();
+            for (HttpCookie httpCookie : cookies) {
+
+                Log.i("HttpOnly", httpCookie.isHttpOnly());
+            }
+        }
+
+iOS： 
+偵測Cookie是否為httpOnly/requireSSL
+監聽NSURLConnect事件
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+    NSLog(@"--------------didReceiveResponse dump NSHTTPCookieStorage------------\n");
+    for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies])
+    {
+        NSLog(@"name: '%@'\n",   [cookie name]);
+        NSLog(@"value: '%@'\n",  [cookie value]);
+        NSLog(@"domain: '%@'\n", [cookie domain]);
+        NSLog(@"path: '%@'\n",   [cookie path]);
+        NSLog(@"HttpOnly,Secure: '%d,%d'\n",   [cookie isHTTPOnly], [cookie isSecure]);
+    }
+}
+主機端： 
+輸出網頁內容時，設定Cookie Http-Only 與 Secure 旗標，以保持安全。
+<httpCookies httpOnlyCookies="true" …>
+<httpCookies requireSSL="true" />
