@@ -1,0 +1,34 @@
+不安全程式碼範例： 
+TextView tv = (TextView) findViewById(R.id.textview); 
+InputStreamReader isr = null;
+char[] text = new char[1024];
+int read;
+try {
+    String urlstr = getIntent().getStringExtra("WEBPAGE_URL");
+    URL url = new URL(urlstr);
+    isr = new InputStreamReader(url.openConnection().getInputStream()); 
+	//此處並無防止"file://..." 這種型式的。在此情形之下，本機端的檔案會被開啟，並且將內容秀在TextView中，而非原先預請的遠端網頁 
+
+    while ((read=isr.read(text)) != -1) {
+        tv.append(new String(text, 0, read)); 
+    }
+} catch (MalformedURLException e) { ... };
+
+安全程式碼範例： 
+TextView tv = (TextView) findViewById(R.id.textview); 
+InputStreamReader isr = null;
+char[] text = new char[1024];
+int read;
+try {
+    String urlstr = getIntent().getStringExtra("WEBPAGE_URL"); 
+    URL url = new URL(urlstr);
+    //加入明確檢查是否是使用http或https protocol, 如不是則產生例外
+    String prot = url.getProtocol();
+    if (!"http".equals(prot) && !"https".equals(prot)) {
+        throw new MalformedURLException("invalid protocol"); 
+    }
+    isr = new InputStreamReader(url.openConnection().getInputStream()); 
+    while ((read=isr.read(text)) != -1) {
+        tv.append(new String(text, 0, read)); 
+    }
+} catch (MalformedURLException e) { .. };
