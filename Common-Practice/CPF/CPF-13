@@ -1,0 +1,106 @@
+安全程式碼範例：
+Android： 
+以下範例說明如何產生一個UUID，以供APP認定此設備為原有設備。
+//在第一次安裝完後，產生一組UUID
+String uniqueId = java.util.UUID.randomUUID().toString();
+String hashId = encrypt(uniqueId);
+//加密完成後，送到主機儲存，以供綁定此設備
+sendToServerToSave(hashId);
+//另儲存於設備上，以供後續比對
+saveHashedId(hashId);
+……..
+……..
+//後續如需檢查時將從主機取得已經hash過的ID， 和本機儲存的ID進行比較，確認是否為同一台設備
+if(! getHasedIdFromServer().equals(getSavedHashedId())){
+	//當不相同的時候，採取相對應的作法，例如要求使用者，登入遠端主機，認証此設備
+}
+   public static String encrypt(String s){
+        MessageDigest sha = null;
+        try{
+            sha = MessageDigest.getInstance("SHA-256");
+            sha.update(s.getBytes());
+        }catch(Exception e){
+            e.printStackTrace();
+            return "";
+        }
+        return byte2hex(sha.digest());
+    }
+    private static String byte2hex(byte[] bytes){
+        String hs="";
+        String stmp="";
+        for (byte myByte: bytes){
+            stmp=(java.lang.Integer.toHexString(myByte & 0XFF));
+            if (stmp.length()==1) hs=hs+"0"+stmp;
+            else hs=hs+stmp;
+        }
+        return hs.toUpperCase();
+    }
+使用Google Play服務提供的SafetyNet API，來檢查設備是否有被Root過，或被篡改。
+byte[] nonce = getRequestNonce(); // Should be at least 16 bytes in length.
+SafetyNet.SafetyNetApi.attest(mGoogleApiClient, nonce)
+        .setResultCallback(new ResultCallback<SafetyNetApi.AttestationResult>() {
+
+    @Override
+    public void onResult(SafetyNetApi.AttestationResult result) {
+        Status status = result.getStatus();
+        if (status.isSuccess()) {
+            // 通訊成功
+            String data = result.getJwsResult();
+	           // 對data進行相關解碼，取得"ctsProfileMatch": true則表示設備正常，反之則表示設備不安全
+
+        } else {
+            // An error occurred while communicating with the service
+        }
+    }
+});
+
+iOS： 
+通常會使用第三方帳號認證，茲提供OAuth2範例，以取得第三方的Token，當作認證ID
+OAuth 2應用範例
+1.註冊並宣告服務
+let googleConfig = GoogleConfig(
+clientId: "YOUR_GOOGLE_CLIENT_ID",                               // [1] Define a Google configuration
+scopes:["https://www.googleapis.com/auth/drive"])                // [2] Specify scope
+ 
+let gdModule = AccountManager.addGoogleAccount(googleConfig)     // [3] Add it to AccountManager
+self.http.authzModule = gdModule                                 // [4] Inject the AuthzModule 
+                                                                 // into the HTTP layer object 
+ 
+let multipartData = MultiPartData(data: self.snapshot(),         // [5] Define multi-part 
+          name: "image",
+          filename: "incognito_photo",
+          mimeType: "image/jpg")
+let multipartArray =  ["file": multipartData]
+ 
+self.http.POST("https://www.googleapis.com/upload/drive/v2/files",   // [6] Upload image
+               parameters: multipartArray,
+               completionHandler: {(response, error) in
+  if (error != nil) {
+    self.presentAlert("Error", message: error!.localizedDescription)
+  } else {
+    self.presentAlert("Success", message: "Successfully uploaded!")
+  }
+})
+
+註冊App應用連結
+<key>CFBundleURLTypes</key>
+<array>
+    <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+            <string>com.raywenderlich.Incognito</string>
+        </array>
+    </dict>
+</array>
+3.接收App應用連結
+func application(application: UIApplication,
+  openURL url: NSURL,
+  sourceApplication: String?,
+  annotation: AnyObject?) -> Bool {
+    let notification = NSNotification(name: AGAppLaunchedWithURLNotification,
+      object:nil,
+      userInfo:[UIApplicationLaunchOptionsURLKey:url])
+    NSNotificationCenter.defaultCenter().postNotification(notification)
+    return true
+}
+
