@@ -1,0 +1,16 @@
+不安全程式碼範例：
+網站主機： 
+.NET疑慮：SessionID預設為120位元
+ASP.NET的SessionID是由24個字元構成，每個字元是由小寫a到z，加上0到5，即32種組合，實際有效的位元數是2的5次方。總共是24*5=120位元
+
+安全程式碼範例：
+網站主機： 
+實作SessionIDManager：128位元之SessionID
+    //
+    // ISessionIDManager.CreateSessionID
+    //
+    public string CreateSessionID(HttpContext context)
+    {
+      //Guid的值是128位元
+      return Guid.NewGuid().ToString();
+    }
