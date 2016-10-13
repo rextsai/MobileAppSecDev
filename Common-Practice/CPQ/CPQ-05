@@ -1,0 +1,55 @@
+不安全程式碼範例：
+Android： 
+SQL語法直接使用+的法式將使用者的輸入串連起來
+tring commandString = "INSERT INTO mytable (idno, name) VALUES '"+userInputIdno+",'"+userInputName+"'";
+try {
+    mSampleDB.execSQL(commandString);
+}catch (SQLException e) {
+    ...... 
+} finally {
+    sqlStmt.close();
+}
+
+iOS： 
+sqlite錯誤方式
+- (IBAction) insertUnsafe : (id) sender
+{
+    BOOL rst = [self executeSQL:[NSString stringWithFormat:@"INSERT INTO Setting(SKey,SValue) VALUES('%@','%@')", self.edit_key.text, self.edit_value.text]];
+}
+
+安全程式碼範例：
+Android： 
+使用參數化方式避免使用者的惡意輸入
+String commandString = "INSERT INTO mytable (idno, name) VALUES (?, ?)"; 
+//使用參數化的SQLiteStatement以防止SQL InjectionSQL Injection
+SQLiteStatement sqlStmt = mSampleDB.compileStatement(commandString);
+sqlStmt.bindString(1, userInputIdno);
+sqlStmt.bindString(2, userInputName);
+try {
+    sqlStmt.executeInsert(); 
+}catch (SQLException e) {
+    ...... 
+} finally {
+    sqlStmt.close();
+}
+
+iOS： 
+資料庫：sqlite正確方式，即CPQ-03：Query parameterization
+- (IBAction) insertSafe : (id) sender
+{
+    sqlite3_stmt *statement;
+    BOOL DONE = TRUE;
+    char *sql = "INSERT INTO Setting(SKey,SValue) VALUES(?,?)";
+    
+    if (sqlite3_prepare_v2(database,sql,-1,&statement,NULL) == SQLITE_OK) {
+        sqlite3_bind_text(statement,1,[self.edit_key.text UTF8String],-1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(statement,2,[self.edit_value.text UTF8String],-1, SQLITE_TRANSIENT);
+        if (sqlite3_step(statement) != SQLITE_DONE) {
+            DONE = FALSE;
+            NSLog(@"Error");
+        }
+    }
+    else
+        DONE = FALSE;
+    sqlite3_finalize(statement);
+}
