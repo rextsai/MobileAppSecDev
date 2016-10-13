@@ -1,0 +1,7 @@
+不安全程式碼範例：
+使用其他屬性的參數，造成可能的漏洞，例如備份檔被其他機器還原。
+
+安全程式碼範例： 
+ 使用嚴格參數，以免資料洩漏
+  // Protect the keychain entry so it's only valid when the device is unlocked.
+  [dictionary setObject:(__bridge id)kSecAttrAccessibleWhenUnlockedThisDeviceOnly forKey:(__bridge id)kSecAttrAccessible];
