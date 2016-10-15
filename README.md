@@ -5,7 +5,7 @@
 =====================
 
 ** Content 內容
- - Common Practice 最佳實務(https://github.com/rextsai/MobileAppSecDev/tree/master/Common-Pratice)
+ - Common Practice 最佳實務(https://github.com/rextsai/MobileAppSecDev/tree/master/Common-Practice)
  - Source Project 原始碼專案(https://github.com/rextsai/MobileAppSecDev/tree/master/Source-Project)
  
 =====================
